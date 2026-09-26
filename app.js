@@ -91,9 +91,13 @@ async function connect() {
 
   connecting = (async () => {
     try {
-      /* must run inside the user gesture: no await before requestDevice() */
+      /* must run inside the user gesture: no await before requestDevice().
+       * iOS/Bluefy cannot filter-scan for this ESP32's custom 128-bit service
+       * UUID, which made the picker come back empty. Open the picker for all
+       * nearby BLE devices instead - the Camper Screen service/characteristic
+       * stay reachable because the service is declared in optionalServices. */
       device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [SERVICE_UUID] }],
+        acceptAllDevices: true,
         optionalServices: [SERVICE_UUID]
       });
 
